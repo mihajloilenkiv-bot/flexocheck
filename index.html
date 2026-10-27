@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="uk"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FlexoCheck Go</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#e8ecef;--panel:#fff;--ink:#14213d;--mut:#5b6678;--line:#cfd6de;--acc:#0086a8;--on:#fff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#10151c;--panel:#1a222d;--ink:#e6ebf2;--mut:#93a0b3;--line:#2c3746;--acc:#3cc4e6;--on:#08202a}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 "IBM Plex Sans",system-ui,sans-serif}
+main{display:grid;grid-template-columns:1fr 330px;gap:14px;padding:14px;max-width:1400px;margin:auto}
+@media(max-width:860px){main{grid-template-columns:1fr}}
+h1{font-size:18px;margin:0 0 8px}
+.bar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:6px}.sp{flex:1}
+#vw{position:relative;height:66vh;min-height:320px;background:repeating-conic-gradient(#0001 0 25%,#0000 0 50%) 0 0/16px 16px;border:1px solid var(--line);border-radius:6px;overflow:hidden;touch-action:none}
+#cv{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
+#lp{display:none;position:fixed;pointer-events:none;z-index:9;border:2px solid var(--acc);border-radius:50%;background:#fff;width:120px;height:120px}
+.side{display:flex;flex-direction:column;gap:12px}
+.box{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:12px}
+.box h2{font-size:14px;margin:0 0 6px}
+label{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:6px 0;font-size:14px}
+input[type=number],input[type=text]{width:100px;padding:5px;border:1px solid var(--line);border-radius:4px;background:var(--bg);color:var(--ink);font:inherit}
+input[type=range]{width:150px;accent-color:var(--acc)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:4px;padding:6px 12px;font:inherit;cursor:pointer;min-height:36px}
+.chip[aria-pressed=true]{background:var(--acc);color:var(--on);border-color:var(--acc)}
+.chip:focus-visible,input:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.out{font-size:13px;color:var(--mut);min-height:20px}.out b{color:var(--ink)}
+.big{font-size:22px;font-weight:600}
+.file{display:block;padding:10px;border:1px dashed var(--acc);border-radius:6px;text-align:center;cursor:pointer;color:var(--acc);font-weight:600}
+.file input{display:none}
+.row{display:flex;align-items:center;gap:8px;padding:3px 0;flex-wrap:wrap}
+.row input[type=checkbox]{width:20px;height:20px;accent-color:var(--acc);margin:0}
+.sw{width:20px;height:20px;border:1px solid var(--line);border-radius:3px;padding:0;background:none}
+.nm{flex:1}.pc{color:var(--mut);font-size:12px}.gh{font-weight:600;margin-top:6px}
+.tp{display:flex;flex-direction:column;gap:12px}.tp[hidden]{display:none}
+:root{--bg:#eceff3;--panel:#fff;--ink:#0f1a2b;--mut:#5d6a80;--line:#dde2e9;--acc:#0a7f9e;--on:#fff;--ws:#34373c;--r:8px}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0d1116;--panel:#171d25;--ink:#e8edf4;--mut:#8b98ad;--line:#27303c;--acc:#3cc4e6;--on:#062029;--ws:#22262b}}
+body{font-size:14px;-webkit-font-smoothing:antialiased}
+main{grid-template-columns:1fr 340px;gap:16px;padding:16px}
+.hd{display:flex;align-items:center;gap:10px;margin-bottom:12px}.hd h1{margin:0;font-size:17px;letter-spacing:-.01em}.tag{font-size:12px;color:var(--mut)}
+#vw{background:var(--ws);border:0;border-radius:var(--r);box-shadow:0 0 0 1px var(--line)}
+.bar{margin-bottom:8px;gap:10px}
+.chip{border-radius:6px;background:var(--panel);font-size:13px;font-weight:500;transition:background .12s,border-color .12s}.chip:hover{border-color:var(--acc)}
+.seg{display:flex;gap:0;flex-wrap:nowrap}.seg .chip{border-radius:0;margin-left:-1px;padding:6px 14px}.seg .chip:first-child{border-radius:6px 0 0 6px;margin-left:0}.seg .chip:last-child{border-radius:0 6px 6px 0}.seg .chip[aria-pressed=true]{position:relative;z-index:1}
+#tabs{position:sticky;top:0;z-index:3;padding-bottom:4px;background:var(--bg)}#tabs .chip{flex:1;padding:8px 4px}
+.box{border:0;border-radius:var(--r);box-shadow:0 0 0 1px var(--line);padding:14px}
+.box h2{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin:0 0 8px}
+.side,.tp{gap:12px}label{font-size:13px}
+input[type=number],input[type=text]{height:34px;border-radius:6px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:13px;text-align:right}input[type=text]{text-align:left}
+.file{border:0;background:var(--acc);color:var(--on);border-radius:var(--r);padding:12px;font-size:14px}
+.row{padding:4px 6px;margin:0 -6px;border-radius:6px}.row:hover{background:var(--bg)}
+.out{font-size:12.5px;line-height:1.5}#xy,#read,.big{font-family:"IBM Plex Mono",ui-monospace,monospace}#xy,#read{font-size:12.5px}
+.big{color:var(--acc);font-size:26px}
+@media(max-width:860px){main{padding:10px;gap:12px}#vw{height:58vh}.seg .chip{padding:8px 12px}}
+@media(max-width:860px){
+main{display:block;padding:8px}
+section{display:flex;flex-direction:column;gap:6px}
+.tag,#hint,#xy,.sp,#zl{display:none}
+.hd{margin-bottom:0}.hd svg{width:26px;height:26px}.hd h1{font-size:16px}
+.bar{justify-content:space-between;gap:6px;margin:0}
+.chip{min-height:40px}.bar .chip{padding:8px 10px;font-size:12.5px}
+#read{order:2;min-height:38px;font-size:12px}
+#vw{order:3;height:calc(100vh - 215px);height:calc(100dvh - 215px);min-height:240px}
+.side{position:fixed;left:0;right:0;bottom:0;z-index:20;flex-direction:row;flex-wrap:wrap;align-content:flex-start;align-items:center;gap:8px;background:var(--bg);border-radius:14px 14px 0 0;box-shadow:0 -4px 18px rgba(0,0,0,.22);padding:8px 10px calc(10px + env(safe-area-inset-bottom,0px));max-height:58vh;max-height:58dvh;overflow-y:auto;overscroll-behavior:contain}
+.side>.box:first-child{flex:0 0 auto;padding:0;box-shadow:none;background:none}
+.file{font-size:0;height:40px;padding:0 14px;display:flex;align-items:center;border-radius:6px}.file::before{content:"Файл";font-size:13px;font-weight:600}
+#tabs{position:static;flex:1 1 0;padding:0;background:none}#tabs .chip{padding:6px 2px;font-size:12px}
+.tp{flex:0 0 100%;width:100%}
+body:not(.sh) .tp{display:none}
+.row input[type=checkbox]{width:22px;height:22px}
+input[type=number],input[type=text]{height:40px}
+}
+:root,:root:not([data-theme=light]){--bg:#0a1020;--panel:#101a2e;--ink:#e9eefb;--mut:#8fa1c2;--line:#1e2b45;--acc:#ffd21e;--on:#141414;--ws:#070b14}
+#rail{display:flex;flex-direction:column;gap:2px;padding:14px 0;background:var(--panel);border-right:1px solid var(--line)}
+.rb{background:none;border:0;border-left:3px solid transparent;color:var(--mut);display:flex;flex-direction:column;align-items:center;gap:4px;padding:11px 2px;font:inherit;font-size:11px;cursor:pointer}.rb:hover{color:var(--ink)}.rb.on{color:var(--acc);background:var(--bg);border-left-color:var(--acc)}
+.fnm{color:var(--mut);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
+#thumbs{display:flex;gap:10px;overflow-x:auto;padding:10px;background:var(--panel);border-radius:8px;box-shadow:0 0 0 1px var(--line)}
+.th{flex:0 0 auto;background:none;border:2px solid transparent;border-radius:8px;color:var(--mut);font:inherit;font-size:12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;padding:4px}.th canvas{max-width:110px;max-height:72px;background:#fff;border-radius:4px}.th.on{border-color:var(--acc);color:var(--acc)}
+#stat{display:flex;gap:22px;align-items:center;flex-wrap:wrap;padding:10px 14px;background:var(--panel);border-radius:8px;box-shadow:0 0 0 1px var(--line);font-size:12.5px;color:var(--mut)}#stat b{color:var(--ink)}.okd{color:#3ddc84;font-size:20px;line-height:1}
+@media(min-width:861px){main{grid-template-columns:78px 1fr 360px;max-width:1560px;padding:0 16px 16px 0;gap:16px}#rail{position:sticky;top:0;align-self:start;height:100vh}#vw{height:calc(100vh - 330px);min-height:340px}.side>.box:first-child{display:none}.hd{margin-top:14px}}
+@media(max-width:860px){#rail,#thumbs,#stat,#opn,#fn{display:none}}
+</style></head><body>
+<main>
+<nav id="rail"></nav>
+<section>
+<div class="hd"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><rect width="30" height="30" rx="7" fill="var(--acc)"/><circle cx="7" cy="15" r="1.8" fill="var(--on)"/><circle cx="15" cy="15" r="3.4" fill="var(--on)"/><circle cx="23" cy="15" r="5" fill="var(--on)"/></svg><div><h1>FlexoCheck Go</h1><div class="tag">Контроль растрової структури флексо-форм</div></div></div>
+<div class="bar"><button class="chip" id="opn">Відкрити</button><span id="fn" class="fnm">файл не вибрано</span><div class="chips seg" id="tools"></div><span class="sp"></span>
+<button class="chip" id="zo" aria-label="Зменшити">−</button><span id="zl" style="min-width:44px;text-align:center">100%</span><button class="chip" id="zi" aria-label="Збільшити">+</button><button class="chip" id="zf">Вмістити</button></div>
+<div id="vw"><canvas id="cv"></canvas></div>
+<div id="thumbs"></div>
+<canvas id="lp" width="120" height="120"></canvas>
+<div class="out" id="hint" style="margin-top:6px"></div>
+<div class="out" id="xy"></div><div class="out" id="read"></div>
+<div id="stat"><span class="okd">●</span><div><b>Готово</b><br>Розділення й перевірка доступні у правій панелі</div><span class="sp"></span><div>Площа форми<br><b id="sa">—</b></div><div>Витрата фарби (орієнтовно)<br><b id="sk">—</b></div></div>
+</section>
+<aside class="side">
+<div class="box"><label class="file">Відкрити файл: PDF, AI, CDR, TIF, PNG, JPG. Кілька файлів = окремі пластини<input type="file" id="f" accept=".pdf,.ai,.cdr,.tif,.tiff,.len,image/*" multiple></label></div>
+<div class="chips seg" id="tabs"></div><div class="tp" id="t-c">
+<div class="box"><h2>Розділення</h2><div id="inks"></div>
+<label>Пластини чорно-білі <input type="checkbox" id="plc"></label><div class="out" id="spotnote"></div><datalist id="pt"></datalist></div>
+<div class="box"><h2>Орієнтовний рецепт</h2><div class="out" id="rcp">Натисніть «Рецепт» біля плашки або після піпетки. Це узагальнений орієнтир, не точна рецептура.</div>
+<details><summary>Бібліотека Pantone (CSV)</summary><input type="file" id="libf" accept=".csv,.txt" style="margin-top:6px"><div class="out" id="libst"></div><div class="out">Рядок: назва; L; a; b; формула (необов’язково). Роздільник ; або Tab, крапка в числах. Бібліотека зберігається лише в вашому браузері.</div></details>
+<details><summary>Свої базові фарби (необов’язково)</summary><textarea id="bas" rows="5" style="width:100%;margin-top:6px;padding:6px;border:1px solid var(--line);border-radius:4px;background:var(--bg);color:var(--ink);font:inherit" placeholder="Yellow #FEDD00&#10;Rubine #CE0058"></textarea><div class="out">Рядок: назва і колір відбитка основи в hex. Якщо порожньо, береться типовий набір із 9 основ плюс біла.</div></details></div>
+<div class="box" id="laybox" style="display:none"><h2>Шари PDF</h2><div id="lays"></div></div>
+<div class="box"><h2>Симуляція друку</h2><div class="chips seg" id="subs"></div>
+<label>Свій колір підкладки <input type="color" id="cc" value="#d9c9a8"></label>
+<label>Покриття фарб <input type="range" id="op" min="30" max="100" value="100"></label>
+<label>Розтискання точки <input type="range" id="dg" min="0" max="30" value="0"></label></div>
+</div><div class="tp" id="t-v" hidden>
+<div class="box"><h2>Контроль мінімумів</h2>
+<label>Мін. ширина лінії, мм <input type="number" id="mw" value="0.1" min="0.01" step="0.01"></label>
+<label>Мін. зазор, мм <input type="number" id="mgp" value="0.15" min="0.01" step="0.01"></label>
+<label>Мін. точка, % <input type="number" id="mdt" value="2" min="0" step="0.5"></label>
+<button class="chip" id="chk" style="width:100%">Перевірити макет</button>
+<label>Показати на макеті <input type="checkbox" id="shw" checked></label>
+<div class="out" id="prs"></div><div id="prl"></div></div>
+</div><div class="tp" id="t-m" hidden>
+<div class="box"><h2>Розмір і калібрування</h2>
+<label>Ширина макета, см <input type="number" id="wcm" value="30" min="1" step="0.5"></label>
+<label>Реальна довжина лінії, мм <input type="number" id="cal" min="0" step="0.1"></label>
+<button class="chip" id="calb" style="width:100%">Калібрувати за лінією</button></div>
+</div><div class="tp" id="t-p" hidden>
+<div class="box"><h2>Вартість форм</h2>
+<label>Ціна, €/м² <input type="number" id="pr" value="100" min="0" step="1"></label>
+<div class="out" id="area"></div><div class="big" id="cost"></div></div>
+<div class="box"><h2>Витрата фарби</h2>
+<label>Анілокс, см³/м² <input type="number" id="av" value="6" min="0" step="0.5"></label>
+<label>Передача фарби, % <input type="number" id="tr" value="50" min="1" max="100"></label>
+<label>Густина, г/см³ <input type="number" id="ind" value="1" min="0.5" step="0.05"></label>
+<label>Тираж, шт <input type="number" id="run" value="1000" min="1"></label>
+<label>Ціна фарби, €/кг <input type="number" id="ipr" value="10" min="0" step="0.5"></label>
+<div class="out" id="ink"></div></div></div>
+</aside>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/utif@3.1.0/UTIF.js"></script>
+<script>
+var $=function(i){return document.getElementById(i)};
+var cv=$("cv"),cx=cv.getContext("2d"),vw=$("vw"),lp=$("lp"),lc=lp.getContext("2d"),sc=document.createElement("canvas"),sx=sc.getContext("2d",{willReadFrequently:true});
+var DPR=Math.min(2,window.devicePixelRatio||1),src=null,V={s:1,x:0,y:0,f:1},sub=[255,255,255],tool="pan",line=null,act=-1,P={},G=null,pan=null;
+var INK=[[0,174,239],[236,0,140],[255,242,0],[35,31,32]],PN=["Cyan","Magenta","Yellow","Black"],proc=[1,1,1,1],cov=[0,0,0,0],sp=[];
+var PT={"PROCESS BLUE C":"#0085CA","REFLEX BLUE C":"#001489","BLUE 072 C":"#10069F","286 C":"#0033A0","287 C":"#003087","300 C":"#005EB8","2935 C":"#0057B8","2728 C":"#0047BB","3005 C":"#0077C8","485 C":"#DA291C","186 C":"#C8102E","032 C":"#EF3340","WARM RED C":"#F9423A","021 C":"#FE5000","RUBINE RED C":"#CE0058","RHODAMINE RED C":"#E10098","PURPLE C":"#BB29BB","VIOLET C":"#440099","1235 C":"#FFB81C","123 C":"#FFC72C","116 C":"#FFCD00","YELLOW C":"#FEDD00","354 C":"#00B140","347 C":"#009A44","361 C":"#43B02A","GREEN C":"#00AB84","BLACK C":"#2D2926","COOL GRAY 9 C":"#75787B","COOL GRAY 5 C":"#B1B3B3","WARM GRAY 5 C":"#ACA39A"};
+Object.keys(PT).forEach(function(k){var o=document.createElement("option");o.value=k;$("pt").appendChild(o)});
+function ptLook(s){var u=s.toUpperCase().replace(/PANTONE|PMS/g,"").replace(/\s+/g," ").trim();return PT[u]||PT[u+" C"]||null}
+function hex(h){return[1,3,5].map(function(i){return parseInt(h.substr(i,2),16)})}
+function hx(c){return"#"+c.map(function(v){return("0"+Math.round(v).toString(16)).slice(-2)}).join("")}
+function msg(t){$("read").textContent=t}
+function grp(id,items,cb){var el=$(id);items.forEach(function(it){var b=document.createElement("button");b.className="chip";b.textContent=it[1];b.setAttribute("aria-pressed",it[2]?"true":"false");b.onclick=function(){[].forEach.call(el.children,function(x){x.setAttribute("aria-pressed","false")});b.setAttribute("aria-pressed","true");cb(it[0])};el.appendChild(b)})}
+var HINT={pan:"Рука: тягніть зображення. Масштаб: коліщатко миші, щипок двома пальцями або кнопки + і −.",line:"Лінійка: проведіть від першої точки до другої. Збільште масштаб для точності, кінець сам притягнеться до краю. Точки можна підхоплювати й пересувати.",pick:"Піпетка: торкніться точки, щоб побачити C M Y K."};
+grp("tools",[["pan","Рука",1],["line","Лінійка",0],["pick","Піпетка",0]],function(k){tool=k;$("hint").textContent=HINT[k]});$("hint").textContent=HINT.pan;
+grp("subs",[["w","Біла",1],["k","Крафт",0],["c","Свій",0]],function(k){sub=k=="w"?[255,255,255]:k=="k"?[196,168,124]:hex($("cc").value);rerender()});
+$("cc").oninput=function(){sub=hex($("cc").value);rerender()};
+["op","dg","plc"].forEach(function(i){$(i).oninput=rerender});["wcm","pr"].forEach(function(i){$(i).oninput=upd});
+/* ---- вигляд і масштаб ---- */
+function resize(){cv.width=vw.clientWidth*DPR;cv.height=vw.clientHeight*DPR;draw()}
+new ResizeObserver(resize).observe(vw);
+function fit(){if(!src)return;var w=vw.clientWidth,h=vw.clientHeight,s=Math.min(w/src.width,h/src.height)*.98;V.f=V.s=s;V.x=(w-src.width*s)/2;V.y=(h-src.height*s)/2;draw()}
+function zoomAt(f,px,py){var s=Math.max(V.f*.5,Math.min(V.f*80,V.s*f));V.x=px-(px-V.x)*s/V.s;V.y=py-(py-V.y)*s/V.s;V.s=s;draw()}
+$("zi").onclick=function(){zoomAt(1.6,vw.clientWidth/2,vw.clientHeight/2)};$("zo").onclick=function(){zoomAt(1/1.6,vw.clientWidth/2,vw.clientHeight/2)};$("zf").onclick=fit;
+vw.addEventListener("wheel",function(e){e.preventDefault();var r=vw.getBoundingClientRect();zoomAt(Math.exp(-e.deltaY*.0015),e.clientX-r.left,e.clientY-r.top)},{passive:false});
+function draw(){cx.setTransform(DPR,0,0,DPR,0,0);cx.clearRect(0,0,vw.clientWidth,vw.clientHeight);$("zl").textContent=Math.round(V.s/V.f*100)+"%";if(!src)return;cx.imageSmoothingEnabled=V.s<1.5;cx.drawImage(sc,V.x,V.y,src.width*V.s,src.height*V.s);if(ov&&$("shw").checked)cx.drawImage(ov,V.x,V.y,src.width*V.s,src.height*V.s);
+if(line){var X=function(i){return V.x+line[i]*V.s},Y=function(i){return V.y+line[i]*V.s};cx.strokeStyle=cx.fillStyle="#e0002a";cx.lineWidth=1.5;cx.beginPath();cx.moveTo(X(0),Y(1));cx.lineTo(X(2),Y(3));cx.stroke();[[0,1],[2,3]].forEach(function(i){cx.beginPath();cx.arc(X(i[0]),Y(i[1]),5,0,7);cx.fill()})}}
+function ip(x,y){var r=vw.getBoundingClientRect();return[(x-r.left-V.x)/V.s,(y-r.top-V.y)/V.s]}
+function mmk(){return(+$("wcm").value)*10/src.width}
+function meas(){if(!line||!src)return;var k=mmk(),dx=Math.abs(line[2]-line[0])*k,dy=Math.abs(line[3]-line[1])*k;$("read").innerHTML="Довжина <b>"+Math.hypot(dx,dy).toFixed(2)+" мм</b> · ΔX "+dx.toFixed(2)+" · ΔY "+dy.toFixed(2)+" мм"}
+function snap(q){var R=Math.max(1,Math.round(7/V.s)),W=src.width,H=src.height,d=src.data,best=q,bg=36,x0=Math.round(q[0]),y0=Math.round(q[1]);
+function L(x,y){var o=(Math.min(H-1,Math.max(0,y))*W+Math.min(W-1,Math.max(0,x)))*4;return .3*d[o]+.59*d[o+1]+.11*d[o+2]}
+for(var y=y0-R;y<=y0+R;y++)for(var x=x0-R;x<=x0+R;x++){var dd=Math.hypot(x-q[0],y-q[1]);if(dd>R)continue;var g=Math.hypot(L(x+1,y)-L(x-1,y),L(x,y+1)-L(x,y-1))*(1-dd/(R*1.6));if(g>bg){bg=g;best=[x+.5,y+.5]}}
+return best}
+function loupe(cx0,cy0,q){var hw=8;lp.style.display="block";lc.fillStyle="#fff";lc.fillRect(0,0,120,120);lc.imageSmoothingEnabled=false;lc.drawImage(sc,q[0]-hw,q[1]-hw,2*hw,2*hw,0,0,120,120);lc.strokeStyle="#e0002a";lc.lineWidth=1;lc.beginPath();lc.moveTo(60,0);lc.lineTo(60,120);lc.moveTo(0,60);lc.lineTo(120,60);lc.stroke();var y=cy0-160;if(y<8)y=cy0+40;lp.style.left=Math.max(4,Math.min(innerWidth-124,cx0-60))+"px";lp.style.top=y+"px"}
+vw.onpointerdown=function(e){if(!src)return;vw.setPointerCapture(e.pointerId);P[e.pointerId]=[e.clientX,e.clientY];var ids=Object.keys(P);
+if(ids.length==2){act=-1;pan=null;lp.style.display="none";var a=P[ids[0]],b=P[ids[1]];G={d:Math.hypot(a[0]-b[0],a[1]-b[1])||1,s:V.s,p:ip((a[0]+b[0])/2,(a[1]+b[1])/2)};return}
+var q=ip(e.clientX,e.clientY);
+if(tool=="pan"){pan={x:e.clientX,y:e.clientY,l:V.x,t:V.y};return}
+if(tool=="pick"){var qx=Math.floor(q[0]),qy=Math.floor(q[1]);if(qx<0||qy<0||qx>=src.width||qy>=src.height)return;var o=(qy*src.width+qx)*4,r=src.data[o],g=src.data[o+1],b=src.data[o+2],k=1-Math.max(r,g,b)/255,dn=1-k||1,s=[(1-r/255-k)/dn,(1-g/255-k)/dn,(1-b/255-k)/dn,k];$("read").innerHTML=PL?pickP(qx,qy):pickInfo(r,g,b,s);var rb=document.createElement("button");rb.className="chip";rb.textContent="Орієнтовний рецепт";rb.onclick=function(){recipe([r,g,b],"Колір піпетки")};$("read").appendChild(rb);return}
+var th=22/V.s;act=-1;if(line)for(var i=0;i<2;i++)if(Math.hypot(line[i*2]-q[0],line[i*2+1]-q[1])<th)act=i;
+if(act<0&&line&&line[0]==line[2]&&line[1]==line[3]){line[2]=q[0];line[3]=q[1];act=1}
+if(act<0){line=[q[0],q[1],q[0],q[1]];act=1}
+loupe(e.clientX,e.clientY,[line[act*2],line[act*2+1]]);draw();meas()};
+vw.onpointermove=function(e){if(!src)return;if(!(e.pointerId in P)){var m=ip(e.clientX,e.clientY),k=mmk();$("xy").textContent="X "+(m[0]*k).toFixed(1)+" · Y "+(m[1]*k).toFixed(1)+" мм";return}
+P[e.pointerId]=[e.clientX,e.clientY];
+if(G){var ids=Object.keys(P),a=P[ids[0]],b=P[ids[1]];if(!b)return;var s=Math.max(V.f*.5,Math.min(V.f*80,G.s*Math.hypot(a[0]-b[0],a[1]-b[1])/G.d)),r=vw.getBoundingClientRect();V.s=s;V.x=(a[0]+b[0])/2-r.left-G.p[0]*s;V.y=(a[1]+b[1])/2-r.top-G.p[1]*s;draw();return}
+if(pan){V.x=pan.l+e.clientX-pan.x;V.y=pan.t+e.clientY-pan.y;draw();return}
+if(act>=0&&line){var q=ip(e.clientX,e.clientY);line[act*2]=q[0];line[act*2+1]=q[1];loupe(e.clientX,e.clientY,q);draw();meas()}};
+vw.onpointerup=vw.onpointercancel=function(e){delete P[e.pointerId];if(Object.keys(P).length<2)G=null;pan=null;
+if(act>=0&&line&&e.type=="pointerup"){var q=snap(ip(e.clientX,e.clientY)),same=line[0]==line[2]&&line[1]==line[3];line[act*2]=q[0];line[act*2+1]=q[1];if(same){line[0]=q[0];line[1]=q[1]}}
+act=-1;lp.style.display="none";draw();meas()};
+$("calb").onclick=function(){var real=+$("cal").value;if(!line||!real||(line[0]==line[2]&&line[1]==line[3])){msg("Спершу виміряйте відому відстань лінійкою й введіть її реальну довжину в мм.");return}$("wcm").value=(real/10*src.width/Math.hypot(line[2]-line[0],line[3]-line[1])).toFixed(3);upd();meas()};
+/* ---- плашки й панель розділень ---- */
+function buildPalette(){var d=src.data,bins={},n=0,av=[0,0,0,0];
+for(var i=0;i<d.length;i+=16){var r=d[i],g=d[i+1],b=d[i+2],k=(r>>4)<<8|(g>>4)<<4|b>>4,bn=bins[k]||(bins[k]=[0,0,0,0]);bn[0]++;bn[1]+=r;bn[2]+=g;bn[3]+=b;n++;var kk=1-Math.max(r,g,b)/255,dn=1-kk||1;av[0]+=(1-r/255-kk)/dn;av[1]+=(1-g/255-kk)/dn;av[2]+=(1-b/255-kk)/dn;av[3]+=kk}
+cov=av.map(function(v){return v/n*100});
+var sol=[];for(var m=1;m<16;m++){var c=[255,255,255];for(var j=0;j<4;j++)if(m>>j&1)for(var q=0;q<3;q++)c[q]*=INK[j][q]/255;sol.push(c)}
+var arr=Object.keys(bins).map(function(k){var b=bins[k];return{n:b[0],c:[b[1]/b[0],b[2]/b[0],b[3]/b[0]]}}).sort(function(a,b){return b.n-a.n});
+sp=[];arr.forEach(function(e){if(sp.length>=8||e.n/n<.004)return;if(e.c[0]>238&&e.c[1]>238&&e.c[2]>238)return;
+if(sol.some(function(s){return Math.hypot(s[0]-e.c[0],s[1]-e.c[1],s[2]-e.c[2])<60}))return;
+if(sp.some(function(p){return Math.hypot(p.c[0]-e.c[0],p.c[1]-e.c[1],p.c[2]-e.c[2])<48}))return;sp.push({c:e.c,rep:e.c.slice(),on:1,pct:e.n/n*100})});
+recov();buildInks()}
+function buildInks(){if(PL){buildInksP();return}var el=$("inks");el.innerHTML="";var boxes=[];
+function row(parent,checked,on,col,name,pct){var r=document.createElement("div"),c=document.createElement("input"),s=document.createElement("div"),t=document.createElement("span"),p=document.createElement("span");r.className="row";c.type="checkbox";c.checked=checked;c.setAttribute("aria-label",name);c.onchange=on;s.className="sw";s.style.background=col;t.className="nm";t.textContent=name;p.className="pc";p.textContent=pct;r.appendChild(c);r.appendChild(s);r.appendChild(t);r.appendChild(p);parent.appendChild(r);return{r:r,c:c,s:s}}
+var gh=document.createElement("div");gh.className="gh";gh.textContent="Процесні фарби";el.appendChild(gh);
+var all=row(el,true,function(){var v=all.c.checked;boxes.forEach(function(b,i){b.c.checked=v;proc[i]=v?1:0});rerender()},"linear-gradient(90deg,#00aeef,#ec008c,#fff200,#231f20)","CMYK","");
+INK.forEach(function(c,i){var b=row(el,!!proc[i],function(){proc[i]=b.c.checked?1:0;all.c.checked=proc.some(function(x){return x});rerender()},hx(c),PN[i],cov[i]>.5?"сер. "+Math.round(cov[i])+"%":"—");b.r.style.paddingLeft="14px";boxes.push(b)});
+if(sp.length){var g2=document.createElement("div");g2.className="gh";g2.textContent="Плашки";el.appendChild(g2)}
+sp.forEach(function(p,i){var b=row(el,!!p.on,function(){p.on=b.c.checked?1:0;rerender()},hx(p.c),"Плашка "+(i+1),p.pct.toFixed(1)+"% площі"),ci=document.createElement("input"),ti=document.createElement("input");
+b.s.style.position="relative";ci.type="color";ci.value=hx(p.c);ci.title="Замінити колір";ci.style.cssText="position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer";ci.oninput=function(){p.rep=hex(ci.value);b.s.style.background=ci.value;rerender();$("spotnote").textContent=deTxt(p)};b.s.appendChild(ci);
+ti.type="text";ti.placeholder="Замінити на Pantone, напр. 485 C";ti.setAttribute("list","pt");ti.style.cssText="width:100%;margin-left:28px";ti.onchange=function(){var inf=ti.value&&pinfo(ti.value),h=inf&&inf.hex;if(h){pshow(ti.value,inf);p.rep=hex(h);ci.value=h;b.s.style.background=h;rerender();$("spotnote").textContent="Заміна на "+ti.value+(inf.off?" (Lab з вашої бібліотеки). ":": наближене sRGB-значення. ")+deTxt(p)}else if(ti.value)$("spotnote").textContent="«"+ti.value+"» немає у вбудованому списку. Оберіть колір, торкнувшись квадратика."};b.r.appendChild(ti);var rb=document.createElement("button");rb.className="chip";rb.textContent="Рецепт";rb.style.marginLeft="28px";rb.onclick=function(){recipe(p.rep,"Плашка "+(sp.indexOf(p)+1))};b.r.appendChild(rb)});
+$("spotnote").textContent=sp.length?"Квадратик плашки відкриває вибір кольору для заміни.":""}
+/* ---- симуляція ---- */
+function rerender(){if(!src)return;sim();draw();inkCalc()}
+function sim(){if(PL){simP();return}var W=src.width,H=src.height,d=src.data,o=sx.createImageData(W,H),p=o.data,a=+$("dg").value/100,op=+$("op").value/100,pl=$("plc").checked,S=[0,0,0,0],rt=[1,1,1];
+for(var i=0;i<d.length;i+=4){var r=d[i],g=d[i+1],b=d[i+2],bi=-1,bd=4800;
+for(var j=0;j<sp.length;j++){var c=sp[j].c,q=(c[0]-r)*(c[0]-r)+(c[1]-g)*(c[1]-g)+(c[2]-b)*(c[2]-b);if(q<bd){bd=q;bi=j}}
+if(bi>=0){var e=sp[bi];if(pl){p[i]=p[i+1]=p[i+2]=e.on?0:255}else if(!e.on){p[i]=sub[0];p[i+1]=sub[1];p[i+2]=sub[2]}else{for(var c2=0;c2<3;c2++){var v=(d[i+c2]+e.rep[c2]-e.c[c2])*sub[c2]/255;p[i+c2]=sub[c2]+(v-sub[c2])*op}}p[i+3]=255;continue}
+var k=1-Math.max(r,g,b)/255,dn=1-k||1;S[0]=(1-r/255-k)/dn;S[1]=(1-g/255-k)/dn;S[2]=(1-b/255-k)/dn;S[3]=k;
+if(pl){var mx=0;for(var n=0;n<4;n++)if(proc[n]){var gv=Math.min(1,S[n]+a*4*S[n]*(1-S[n]));if(gv>mx)mx=gv}p[i]=p[i+1]=p[i+2]=255*(1-mx);p[i+3]=255;continue}
+rt[0]=rt[1]=rt[2]=1;for(var n=0;n<4;n++)for(var c3=0;c3<3;c3++){var t=1-INK[n][c3]/255,den=1-S[n]*t,num=proc[n]?1-Math.min(1,S[n]+a*4*S[n]*(1-S[n]))*op*t:1;rt[c3]*=num/den}
+p[i]=d[i]*sub[0]/255*rt[0];p[i+1]=d[i+1]*sub[1]/255*rt[1];p[i+2]=d[i+2]*sub[2]/255*rt[2];p[i+3]=255}
+sx.putImageData(o,0,0)}
+function upd(){if(!src)return;var w=+$("wcm").value,h=w*src.height/src.width,ar=w*h;$("area").innerHTML="Площа: <b>"+(ar/10000).toFixed(4)+" м²</b> ("+w.toFixed(1)+" × "+h.toFixed(1)+" см)";$("cost").textContent="€ "+(ar/10000*(+$("pr").value)).toFixed(2);$("sa").textContent=(ar/10000).toFixed(2)+" м²";meas();inkCalc()}
+/* ---- завантаження ---- */
+function setImage(c,keep){PL=null;var s=Math.min(1,1600/Math.max(c.width,c.height)),w=Math.round(c.width*s),h=Math.round(c.height*s);sc.width=w;sc.height=h;sx.fillStyle="#fff";sx.fillRect(0,0,w,h);sx.drawImage(c,0,0,w,h);src=sx.getImageData(0,0,w,h);ov=null;$("prl").innerHTML="";$("prs").textContent="";if(!keep)line=null;buildPalette();sim();if(keep)draw();else fit();upd();thumbs()}
+function loadImg(fl,keep){var im=new Image();im.onerror=function(){msg("Не вдалося відкрити зображення")};im.onload=function(){setImage(im,keep)};im.src=URL.createObjectURL(fl)}
+var PG,VP,OC;
+async function drawPdf(keep){var c=document.createElement("canvas");c.width=VP.width;c.height=VP.height;await PG.render({canvasContext:c.getContext("2d"),viewport:VP,optionalContentConfigPromise:Promise.resolve(OC)}).promise;setImage(c,keep)}
+function buildLayers(){var el=$("lays"),L=[],chs=[];el.innerHTML="";try{for(var e of OC)L.push(e)}catch(x){}$("laybox").style.display=L.length?"block":"none";
+L.forEach(function(e,i){var id=e[0],g=e[1],r=document.createElement("div"),c=document.createElement("input"),t=document.createElement("span"),s=document.createElement("button");r.className="row";c.type="checkbox";c.checked=!!g.visible;t.className="nm";t.textContent=g.name||("Шар "+(i+1));s.className="chip";s.textContent="Лише";chs.push([id,c]);
+c.onchange=function(){OC.setVisibility(id,c.checked);drawPdf(true)};
+s.onclick=function(){chs.forEach(function(x){var v=x[0]===id;OC.setVisibility(x[0],v);x[1].checked=v});drawPdf(true)};r.appendChild(c);r.appendChild(t);r.appendChild(s);el.appendChild(r)})}
+async function openPdf(buf){var pdf=await pdfjsLib.getDocument({data:buf}).promise,pg=await pdf.getPage(1),v0=pg.getViewport({scale:1});PG=pg;VP=pg.getViewport({scale:Math.min(4,1600/Math.max(v0.width,v0.height))});OC=await pdf.getOptionalContentConfig();await drawPdf(false);buildLayers();$("wcm").value=(v0.width/72*2.54).toFixed(1);upd();msg("Сторінка 1 з "+pdf.numPages+". Колір з PDF переведено в RGB, тож розділення наближені.")}
+function openTif(buf){var f=UTIF.decode(buf)[0];UTIF.decodeImage(buf,f);
+var spp=f.t277?f.t277[0]:3,ph=f.t262?f.t262[0]:2,bps=f.t258?f.t258[0]:8,pc=f.t284?f.t284[0]:1;
+if(ph==5&&spp>=4&&bps==8&&pc==1&&f.data&&f.data.length>=f.width*f.height*spp){var NN=f.width*f.height,L=[],nm=["Cyan","Magenta","Yellow","Black"];for(var c0=0;c0<spp;c0++){var d0=new Uint8Array(NN);for(var i0=0,j0=c0;i0<NN;i0++,j0+=spp)d0[i0]=f.data[j0];L.push({name:c0<4?nm[c0]:"Канал "+(c0+1),c:c0<4?INK[c0]:PCOL[(c0-4)%PCOL.length],d:d0})}
+setPlates(L,f.width,f.height);var xr0=f.t282&&f.t282[0],un0=f.t296?f.t296[0]:2;if(xr0){$("wcm").value=(f.width/(un0==3?xr0:xr0/2.54)).toFixed(1);upd()}msg("CMYK TIFF: "+spp+" каналів. Дані беруться з каналів файлу, без переведення в RGB.");return}
+var rgba=UTIF.toRGBA8(f),c=document.createElement("canvas");c.width=f.width;c.height=f.height;c.getContext("2d").putImageData(new ImageData(new Uint8ClampedArray(rgba),f.width,f.height),0,0);setImage(c);var xr=f.t282&&f.t282[0],un=f.t296?f.t296[0]:2;if(xr){$("wcm").value=(f.width/(un==3?xr:xr/2.54)).toFixed(1);upd()}msg("TIFF "+f.width+" x "+f.height+(xr?", "+Math.round(un==3?xr*2.54:xr)+" dpi":""))}
+async function openCdr(buf){var z=await JSZip.loadAsync(buf),best=null,bs=0;for(var n of Object.keys(z.files)){if(!/\.(png|jpe?g|bmp)$/i.test(n))continue;var b=await z.files[n].async("blob");if(b.size>bs){bs=b.size;best=b}}if(!best)throw 0;loadImg(best);msg("Показано вбудоване прев’ю CDR низької роздільності. Для точної перевірки експортуйте макет у PDF.")}
+function scanSpots(buf){var t=new TextDecoder("latin1").decode(buf),re=/\/Separation\s*\/([^\s\/\[\]<>()]+)/g,m,s={};while((m=re.exec(t)))s[m[1].replace(/#20/g," ")]=1;var n=Object.keys(s).filter(function(x){return x!="All"&&x!="None"});$("spotnote").textContent+=n.length?" У файлі є плашки: "+n.join(", ")+".":""}
+$("f").onchange=async function(e){var fl=e.target.files[0];if(!fl)return;$("fn").textContent=e.target.files.length>1?e.target.files.length+" пластин":fl.name;if(e.target.files.length>1){msg("Завантаження пластин…");$("laybox").style.display="none";try{await openPlates([].slice.call(e.target.files))}catch(x){msg("Не вдалося відкрити пластини: "+(x&&x.message?x.message:"невідомий формат"))}return}var ext=fl.name.split(".").pop().toLowerCase();msg("Завантаження…");$("laybox").style.display="none";
+try{var buf=await fl.arrayBuffer(),u=new Uint8Array(buf,0,8),isPdf=u[0]==0x25&&u[1]==0x50,isZip=u[0]==0x50&&u[1]==0x4B;
+if(isPdf){await openPdf(buf);scanSpots(buf)}
+else if(ext=="ai")msg("Цей AI-файл збережено без PDF-сумісності. Збережіть його знову з опцією «Create PDF Compatible File» або експортуйте в PDF.");
+else if(ext=="tif"||ext=="tiff")openTif(buf);
+else if(ext=="cdr"){if(isZip)await openCdr(buf);else msg("Старий формат CDR без прев’ю не читається. Експортуйте макет у PDF.")}
+else if(ext=="len")msg("Формат LEN (Esko) закритий, у браузері його не прочитати. Експортуйте в 1-bit TIFF або надішліть зразок файлу.");
+else loadImg(fl)}catch(err){msg("Не вдалося відкрити файл: "+(err&&err.message?err.message:"невідомий формат"))}};
+grp("tabs",[["c","Кольори",1],["v","Перевірка",0],["p","Вартість",0],["m","Розмір",0]],function(k){["c","v","p","m"].forEach(function(x){$("t-"+x).hidden=x!=k});var sh=document.body.classList;if(k==curTab&&sh.contains("sh"))sh.remove("sh");else sh.add("sh");curTab=k});var curTab="c";
+/* ---- мініатюри, навігація ---- */
+function soloInk(k){if(PL)PL.n.forEach(function(p,j){p.on=(k<0||j==k)?1:0});else{for(var i=0;i<4;i++)proc[i]=(k<0||k==i)?1:0;sp.forEach(function(p){p.on=(k<0||k=="s")?1:0})}buildInks();rerender()}
+function thumbs(){var el=$("thumbs");el.innerHTML="";if(!src)return;var W=src.width,H=src.height,s=Math.min(110/W,72/H),tw=Math.max(1,Math.round(W*s)),th=Math.max(1,Math.round(H*s));
+function cvs(){var c=document.createElement("canvas");c.width=tw;c.height=th;return c}
+function mk(name,c,solo,on){var b=document.createElement("button"),l=document.createElement("span");b.className="th"+(on?" on":"");l.textContent=name;b.appendChild(c);b.appendChild(l);b.onclick=function(){[].forEach.call(el.children,function(x){x.classList.remove("on")});b.classList.add("on");soloInk(solo)};el.appendChild(b)}
+function plate(get,col){var c=cvs(),x=c.getContext("2d"),o=x.createImageData(tw,th),p=o.data;for(var y=0;y<th;y++)for(var xx=0;xx<tw;xx++){var v=get(Math.min(W-1,Math.floor(xx/s)),Math.min(H-1,Math.floor(y/s)))/255,j=(y*tw+xx)*4;for(var k=0;k<3;k++)p[j+k]=255*(1-v*(1-col[k]/255));p[j+3]=255}x.putImageData(o,0,0);return c}
+var oc=cvs();oc.getContext("2d").drawImage(sc,0,0,tw,th);mk("Оригінал",oc,-1,1);
+if(PL)PL.n.forEach(function(p,j){mk(p.name,plate(function(x,y){return p.d[y*W+x]},p.c),j)});
+else{INK.forEach(function(c,n){mk(PN[n],plate(function(x,y){var o=(y*W+x)*4,r=src.data[o],g=src.data[o+1],b=src.data[o+2],k=1-Math.max(r,g,b)/255,dn=1-k||1;return 255*(n==3?k:(1-[r,g,b][n]/255-k)/dn)},c),n)});
+if(sp.length){var pc=cvs(),x=pc.getContext("2d"),w=tw/sp.length;sp.forEach(function(q,i){x.fillStyle=hx(q.c);x.fillRect(i*w,0,w,th)});mk("Плашки",pc,"s")}}}
+$("opn").onclick=function(){$("f").click()};
+(function(){var I=function(p){return'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>'},tb=function(i){$("tabs").children[i].click()},tl=function(i){$("tools").children[i].click()};
+var R=[["Перегляд",I('<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>'),function(){tl(0);fit()}],["Вимірювання",I('<path d="M3 17L17 3l4 4L7 21z"/><path d="M8 12l2 2M11 9l2 2M14 6l2 2"/>'),function(){tl(1);tb(3)}],["Перевірка",I('<circle cx="6" cy="6" r="1"/><circle cx="12" cy="6" r="1.6"/><circle cx="18" cy="6" r="2.2"/><circle cx="6" cy="14" r="1.6"/><circle cx="12" cy="14" r="2.2"/><circle cx="18" cy="14" r="1"/><circle cx="6" cy="21" r="2.2"/><circle cx="12" cy="21" r="1"/>'),function(){tb(1)}],["Кольори",I('<circle cx="12" cy="12" r="9"/><circle cx="8" cy="10" r="1"/><circle cx="12" cy="7" r="1"/><circle cx="16" cy="10" r="1"/>'),function(){tb(0)}],["Файли",I('<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/>'),function(){$("f").click()}],["Вартість",I('<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/>'),function(){tb(2)}]],rail=$("rail");
+R.forEach(function(r,i){var b=document.createElement("button");b.className="rb"+(i==0?" on":"");b.innerHTML=r[1]+"<span>"+r[0]+"</span>";b.onclick=function(){[].forEach.call(rail.children,function(x){x.classList.remove("on")});b.classList.add("on");r[2]()};rail.appendChild(b)})})();
+/* ---- справжні пластини (CMYK/плашки) ---- */
+var PL=null,PCOL=[[255,102,0],[130,60,170],[0,150,90],[200,160,0],[220,50,50],[60,120,220]];
+function shrink(d,W,H,f){var w=Math.floor(W/f),h=Math.floor(H/f),o=new Uint8Array(w*h),n=f*f;for(var y=0;y<h;y++)for(var x=0;x<w;x++){var s=0;for(var yy=0;yy<f;yy++){var r=(y*f+yy)*W+x*f;for(var xx=0;xx<f;xx++)s+=d[r+xx]}o[y*w+x]=s/n}return o}
+function setPlates(list,W,H){var f=Math.max(1,Math.ceil(Math.max(W,H)/1600));if(f>1){list.forEach(function(p){p.d=shrink(p.d,W,H,f)});W=Math.floor(W/f);H=Math.floor(H/f)}
+PL={n:list.map(function(p){var s=0,d=p.d;for(var i=0;i<d.length;i++)s+=d[i];return{name:p.name,c:p.c,d:d,on:1,cov:s/d.length/2.55}})};
+sp=PL.n.slice(4).map(function(){return{on:1,c:[0,0,0],rep:[0,0,0],pct:0}});sc.width=W;sc.height=H;src=sx.createImageData(W,H);line=null;ov=null;$("prl").innerHTML="";$("prs").textContent="";buildInks();simP();fit();upd();thumbs()}
+function simP(){var W=sc.width,H=sc.height,N=W*H,o=sx.createImageData(W,H),p=o.data,a=+$("dg").value/100,op=+$("op").value/100,pl=$("plc").checked,L=PL.n.filter(function(q){return q.on}),i,k,j;
+for(i=0;i<N;i++){j=i*4;if(pl){var mx=0;for(k=0;k<L.length;k++){var s=L[k].d[i]/255,v=Math.min(1,s+a*4*s*(1-s));if(v>mx)mx=v}p[j]=p[j+1]=p[j+2]=255*(1-mx)}
+else{var r=sub[0],g=sub[1],b=sub[2];for(k=0;k<L.length;k++){var s2=L[k].d[i]/255,v2=Math.min(1,s2+a*4*s2*(1-s2))*op,c=L[k].c;r*=1-v2*(1-c[0]/255);g*=1-v2*(1-c[1]/255);b*=1-v2*(1-c[2]/255)}p[j]=r;p[j+1]=g;p[j+2]=b}p[j+3]=255}
+sx.putImageData(o,0,0);src=o}
+function fillP(M,Q,has,N){PL.n.forEach(function(p,j){if(j<4)proc[j]=p.on?1:0;if(!p.on||j>=M.length)return;var m=M[j],q=j<4?Q[j]:null;for(var i=0;i<N;i++){if(p.d[i]>127){m[i]=1;has[j]=1}if(q)q[i]=p.d[i]}})}
+function pickP(x,y){var i=y*sc.width+x;return"Щільність: "+PL.n.filter(function(p){return p.on}).map(function(p){return p.name+" <b>"+Math.round(p.d[i]/2.55)+"%</b>"}).join(" · ")}
+function buildInksP(){var el=$("inks");el.innerHTML="";var gh=document.createElement("div");gh.className="gh";gh.textContent="Пластини з файлу";el.appendChild(gh);
+PL.n.forEach(function(p){var r=document.createElement("div"),c=document.createElement("input"),s=document.createElement("div"),t=document.createElement("span"),q=document.createElement("span"),ci=document.createElement("input");r.className="row";c.type="checkbox";c.checked=true;c.setAttribute("aria-label",p.name);c.onchange=function(){p.on=c.checked?1:0;rerender()};
+s.className="sw";s.style.cssText="position:relative;background:"+hx(p.c);ci.type="color";ci.value=hx(p.c);ci.style.cssText="position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer";ci.oninput=function(){p.c=hex(ci.value);s.style.background=ci.value;rerender()};s.appendChild(ci);
+t.className="nm";t.textContent=p.name;q.className="pc";q.textContent="сер. "+Math.round(p.cov)+"%";r.appendChild(c);r.appendChild(s);r.appendChild(t);r.appendChild(q);el.appendChild(r)});
+$("spotnote").textContent="Дані беруться непосередньо з каналів файлу. Квадратик змінює колір фарби на екрані."}
+function guessInk(n,k){n=n.toLowerCase();if(/cyan|(^|[^a-z])c([^a-z]|$)/.test(n))return[0,INK[0]];if(/magenta|(^|[^a-z])m([^a-z]|$)/.test(n))return[1,INK[1]];if(/yellow|(^|[^a-z])y([^a-z]|$)/.test(n))return[2,INK[2]];if(/black|key|(^|[^a-z])k([^a-z]|$)/.test(n))return[3,INK[3]];return[9,PCOL[k%PCOL.length]]}
+async function plateOf(fl){var ext=fl.name.split(".").pop().toLowerCase(),W,H,rgba;
+if(ext=="tif"||ext=="tiff"){var buf=await fl.arrayBuffer(),f=UTIF.decode(buf)[0];if(f.width*f.height>40e6)throw new Error("файл занадто великий для браузера");UTIF.decodeImage(buf,f);rgba=UTIF.toRGBA8(f);W=f.width;H=f.height}
+else{var im=await createImageBitmap(fl),c=document.createElement("canvas");c.width=W=im.width;c.height=H=im.height;var x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,W,H);x.drawImage(im,0,0);rgba=x.getImageData(0,0,W,H).data}
+var d=new Uint8Array(W*H);for(var i=0,j=0;j<d.length;i+=4,j++)d[j]=255-(.3*rgba[i]+.59*rgba[i+1]+.11*rgba[i+2]);return{name:fl.name.replace(/\.[^.]+$/,""),d:d,W:W,H:H}}
+async function openPlates(files){var L=[],spk=0;for(var fl of files){var p=await plateOf(fl);if(L.length&&(p.W!=L[0].W||p.H!=L[0].H))throw new Error("розміри пластин не збігаються");var g=guessInk(p.name,spk);if(g[0]==9)spk++;p.key=g[0];p.c=g[1];L.push(p)}
+L.sort(function(a,b){return a.key-b.key});setPlates(L,L[0].W,L[0].H);msg("Пластин: "+L.length+". Колір фарби вгадано за назвою файлу, її можна змінити. Чорне в файлі = фарба.")}
+/* ---- бібліотека Pantone ---- */
+var LIB={};
+function pkey(s){return s.toUpperCase().replace(/PANTONE|PMS/g,"").replace(/\s+/g," ").trim()}
+function l2r(L,a,b){var fy=(L+16)/116,fx=a/500+fy,fz=fy-b/200,e=216/24389,k=24389/27,xr=fx*fx*fx>e?fx*fx*fx:(116*fx-16)/k,yr=L>8?fy*fy*fy:L/k,zr=fz*fz*fz>e?fz*fz*fz:(116*fz-16)/k,X=xr*.96422,Y=yr,Z=zr*.82521;return[3.1338561*X-1.6168667*Y-.4906146*Z,-.9787684*X+1.9161415*Y+.033454*Z,.0719453*X-.2289914*Y+1.4052427*Z].map(enc)}
+function pinfo(s){var u=pkey(s),e=LIB[u]||LIB[u+" C"];if(e)return{hex:hx(l2r(e.L,e.a,e.b)),lab:[e.L,e.a,e.b],off:1,f:e.f};var h=ptLook(s);if(!h)return null;var c=hex(h);return{hex:h,lab:lab(c[0],c[1],c[2]),off:0,f:""}}
+function pshow(name,inf){var L=inf.lab,head="<b>Lab "+(inf.off?"з вашої бібліотеки":"(наближено з sRGB, не офіційне)")+":</b> "+L[0].toFixed(1)+" "+L[1].toFixed(1)+" "+L[2].toFixed(1)+"<br>";
+if(inf.f)$("rcp").innerHTML=head+"<b>Формула з бібліотеки ("+name+"):</b> "+inf.f.replace(/&/g,"&amp;").replace(/</g,"&lt;")+"<br>";else recipe(hex(inf.hex),name,head)}
+function fillPt(){$("pt").innerHTML="";Object.keys(PT).concat(Object.keys(LIB)).forEach(function(k){var o=document.createElement("option");o.value=k;$("pt").appendChild(o)})}
+function parseLib(t){LIB={};var n=0;t.split(/\r?\n/).forEach(function(l){var sep=l.indexOf(";")>=0?";":l.indexOf("\t")>=0?"\t":",",f=l.split(sep);if(f.length<4)return;var L=parseFloat(f[1].replace(",",".")),a=parseFloat(f[2].replace(",",".")),b=parseFloat(f[3].replace(",","."));if(isNaN(L)||isNaN(a)||isNaN(b))return;LIB[pkey(f[0])]={L:L,a:a,b:b,f:f.slice(4).join(" ").trim()};n++});$("libst").textContent=n?"У бібліотеці "+n+" кольорів.":"Не вдалося розпізнати рядки. Потрібно: назва; L; a; b; формула.";return n}
+$("libf").onchange=function(e){var f=e.target.files[0];if(!f)return;f.text().then(function(t){if(parseLib(t)){try{localStorage.setItem("pantoneLib",t)}catch(x){}}fillPt()})};
+try{var sl=localStorage.getItem("pantoneLib");if(sl){parseLib(sl);fillPt()}}catch(x){}
+/* ---- орієнтовний рецепт ---- */
+var BASES=[["Yellow","#FEDD00"],["Warm Red","#F9423A"],["Rubine Red","#CE0058"],["Rhodamine Red","#E10098"],["Purple","#BB29BB"],["Reflex Blue","#001489"],["Process Blue","#0085CA"],["Green","#00AB84"],["Black","#2D2926"]];
+function bases(){var out=[];($("bas").value||"").split("\n").forEach(function(l){var m=l.match(/#([0-9a-fA-F]{6})/);if(m)out.push({n:l.replace(m[0],"").replace(/[;,:]/g," ").trim()||m[0],c:hex(m[0])})});
+if(out.length<2)out=BASES.map(function(b){return{n:b[0],c:hex(b[1])}});if(!out.some(function(b){return /біл|white/i.test(b.n)}))out.push({n:"Біла",c:[255,255,255]});return out}
+function lin(v){v/=255;return v<=.04045?v/12.92:Math.pow((v+.055)/1.055,2.4)}
+function enc(v){v=Math.max(0,Math.min(1,v));return 255*(v<=.0031308?12.92*v:1.055*Math.pow(v,1/2.4)-.055)}
+function kso(c){return c.map(function(v){var r=Math.max(.015,Math.min(.97,lin(v)));return(1-r)*(1-r)/(2*r)})}
+function ksr(ks){return enc(1+ks-Math.sqrt(ks*ks+2*ks))}
+function recipe(t,name,head){var B=bases(),K=B.map(function(b){return kso(b.c)}),T=lab(t[0],t[1],t[2]),res=[],n=B.length,N=20,i,j,k,a,b2;
+function add(idx,w){var ks=[0,0,0],q,c;for(q=0;q<idx.length;q++)for(c=0;c<3;c++)ks[c]+=w[q]*K[idx[q]][c];var rgb=ks.map(ksr);res.push({idx:idx,w:w,rgb:rgb,de:de00(T,lab(rgb[0],rgb[1],rgb[2]))})}
+for(i=0;i<n;i++){add([i],[1]);for(j=i+1;j<n;j++){for(a=0;a<=N;a++)add([i,j],[a/N,1-a/N]);for(k=j+1;k<n;k++)for(a=0;a<=N;a++)for(b2=0;a+b2<=N;b2++)add([i,j,k],[a/N,b2/N,(N-a-b2)/N])}}
+res.sort(function(x,y){return x.de-y.de});var seen={},top=[];
+for(i=0;i<res.length&&top.length<3;i++){var r=res[i],ids=[];r.idx.forEach(function(x,q){if(r.w[q]>0)ids.push(x)});var key=ids.sort().join();if(seen[key])continue;seen[key]=1;top.push(r)}
+var sw=function(c){return'<span class="sw" style="display:inline-block;vertical-align:middle;background:'+hx(c)+'"></span>'},html=(head||"")+"<b>"+name+"</b> "+sw(t)+"<br>";
+top.forEach(function(r,q){var parts=r.idx.map(function(x,p){return{n:B[x].n,w:r.w[p]}}).filter(function(p){return p.w>0}).sort(function(x,y){return y.w-x.w});html+=(q+1)+") "+parts.map(function(p){return p.n+" <b>"+Math.round(p.w*100)+"%</b>"}).join(" + ")+" "+sw(r.rgb)+" ΔE00≈"+r.de.toFixed(1)+"<br>"});
+$("rcp").innerHTML=html+"<br>Орієнтир для першої пробної суміші (спрощена модель змішування на екранних кольорах, відсотки за масою за однакової густини). Реальний результат залежить від фарб, анілоксу й підкладки, тож підганяйте відбитком і виміром."}
+/* ---- Lab, ΔE і витрата фарби ---- */
+var lastLab=null;
+function lab(r,g,b){var f=function(v){v/=255;return v<=.04045?v/12.92:Math.pow((v+.055)/1.055,2.4)},R=f(r),G=f(g),B=f(b),X=(.4360747*R+.3850649*G+.1430804*B)/.96422,Y=.2225045*R+.7168786*G+.0606169*B,Z=(.0139322*R+.0971045*G+.7141733*B)/.82521,h=function(t){return t>216/24389?Math.cbrt(t):(24389/27*t+16)/116};return[116*h(Y)-16,500*(h(X)-h(Y)),200*(h(Y)-h(Z))]}
+function de00(p,q){var rad=Math.PI/180,C1=Math.hypot(p[1],p[2]),C2=Math.hypot(q[1],q[2]),Cb=(C1+C2)/2,G=.5*(1-Math.sqrt(Math.pow(Cb,7)/(Math.pow(Cb,7)+Math.pow(25,7)))),a1=(1+G)*p[1],a2=(1+G)*q[1],c1=Math.hypot(a1,p[2]),c2=Math.hypot(a2,q[2]),h1=Math.atan2(p[2],a1)/rad,h2=Math.atan2(q[2],a2)/rad;if(h1<0)h1+=360;if(h2<0)h2+=360;
+var dL=q[0]-p[0],dC=c2-c1,dh=h2-h1;if(c1*c2==0)dh=0;else if(dh>180)dh-=360;else if(dh<-180)dh+=360;var dH=2*Math.sqrt(c1*c2)*Math.sin(dh*rad/2),Lb=(p[0]+q[0])/2,cb=(c1+c2)/2,hb=h1+h2;if(c1*c2!=0){if(Math.abs(h1-h2)>180)hb+=(h1+h2<360?360:-360);hb/=2}
+var T=1-.17*Math.cos((hb-30)*rad)+.24*Math.cos(2*hb*rad)+.32*Math.cos((3*hb+6)*rad)-.2*Math.cos((4*hb-63)*rad),dt=30*Math.exp(-Math.pow((hb-275)/25,2)),Rc=2*Math.sqrt(Math.pow(cb,7)/(Math.pow(cb,7)+Math.pow(25,7))),SL=1+.015*Math.pow(Lb-50,2)/Math.sqrt(20+Math.pow(Lb-50,2)),SC=1+.045*cb,SH=1+.015*cb*T,RT=-Math.sin(2*dt*rad)*Rc;
+return Math.sqrt(Math.pow(dL/SL,2)+Math.pow(dC/SC,2)+Math.pow(dH/SH,2)+RT*(dC/SC)*(dH/SH))}
+function pickInfo(r,g,b,s){var L=lab(r,g,b),t="Lab (D50) <b>"+L[0].toFixed(1)+" "+L[1].toFixed(1)+" "+L[2].toFixed(1)+"</b> · "+hx([r,g,b])+"<br>"+["C","M","Y","K"].map(function(n,i){return n+" <b>"+Math.round(s[i]*100)+"%</b>"}).join(" ")+(lastLab?"<br>ΔE00 до попередньої точки: <b>"+de00(lastLab,L).toFixed(2)+"</b>":"")+"<br>Lab розраховано з екранного RGB, це не замір.";lastLab=L;return t}
+function deTxt(p){return"ΔE00 між оригіналом і заміною: "+de00(lab.apply(null,p.c),lab.apply(null,p.rep)).toFixed(1)}
+function recov(){var d=src.data,a=[0,0,0,0],n=0;for(var i=0;i<d.length;i+=16){n++;var r=d[i],g=d[i+1],b=d[i+2];if(spotIdx(r,g,b)>=0)continue;var k=1-Math.max(r,g,b)/255,dn=1-k||1;a[0]+=(1-r/255-k)/dn;a[1]+=(1-g/255-k)/dn;a[2]+=(1-b/255-k)/dn;a[3]+=k}cov=a.map(function(v){return v/n*100})}
+function inkCalc(){if(!src)return;var w=+$("wcm").value,ar=w*(w*src.height/src.width)/10000,gm=(+$("av").value)*(+$("tr").value)/100*(+$("ind").value),run=+$("run").value,pr=+$("ipr").value,rows=[],tot=0,html="";
+if(PL)PL.n.forEach(function(p){if(p.on)rows.push([p.name,p.cov/100])});else{INK.forEach(function(c,i){if(proc[i])rows.push([PN[i],cov[i]/100])});sp.forEach(function(p,j){if(p.on)rows.push(["Плашка "+(j+1),p.pct/100])})}
+rows.forEach(function(r){var g=ar*r[1]*gm,kg=g*run/1000;tot+=kg;html+=r[0]+": <b>"+g.toFixed(2)+" г</b> на відбиток, "+kg.toFixed(2)+" кг на тираж<br>"});
+$("sk").textContent=tot.toFixed(2)+" кг";$("ink").innerHTML=html+"<br>Разом: <b>"+tot.toFixed(2)+" кг</b> · € <b>"+(tot*pr).toFixed(2)+"</b><br>Орієнтовно: площа покриття береться з екранного зображення, плашки рахуються як суцільна заливка."}
+["av","tr","ind","run","ipr"].forEach(function(i){$(i).oninput=inkCalc});
+/* ---- контроль мінімумів ---- */
+var ov=null;
+function boxop(a,W,H,h,mx){var t=new Uint8Array(a.length),o=new Uint8Array(a.length),x,y,k,v,u,r;
+for(y=0;y<H;y++){r=y*W;for(x=0;x<W;x++){v=mx?0:1;for(k=-h;k<=h;k++){var xx=x+k;if(xx<0)xx=0;else if(xx>=W)xx=W-1;u=a[r+xx];if(mx?u>v:u<v)v=u}t[r+x]=v}}
+for(y=0;y<H;y++)for(x=0;x<W;x++){v=mx?0:1;for(k=-h;k<=h;k++){var yy=y+k;if(yy<0)yy=0;else if(yy>=H)yy=H-1;u=t[yy*W+x];if(mx?u>v:u<v)v=u}o[y*W+x]=v}
+return o}
+function spotIdx(r,g,b){var bi=-1,bd=4800;for(var j=0;j<sp.length;j++){var c=sp[j].c,q=(c[0]-r)*(c[0]-r)+(c[1]-g)*(c[1]-g)+(c[2]-b)*(c[2]-b);if(q<bd){bd=q;bi=j}}return bi}
+function analyze(){var W=src.width,H=src.height,d=src.data,N=W*H,px=mmk(),ns=sp.length,M=[],Q=[],has=[],n,p,i;
+var mw=+$("mw").value,mg=+$("mgp").value,md=+$("mdt").value,hw=Math.min(8,Math.round(mw/px/2)),hg=Math.min(8,Math.round(mg/px/2));
+for(n=0;n<4+ns;n++)M.push(new Uint8Array(N));for(n=0;n<4;n++)Q.push(new Uint8Array(N));
+if(PL)fillP(M,Q,has,N);else for(i=0,p=0;p<N;i+=4,p++){var r=d[i],g=d[i+1],b=d[i+2],bi=spotIdx(r,g,b);
+if(bi>=0){if(sp[bi].on){M[4+bi][p]=1;has[4+bi]=1}continue}
+var k=1-Math.max(r,g,b)/255,dn=1-k||1,S=[(1-r/255-k)/dn,(1-g/255-k)/dn,(1-b/255-k)/dn,k];
+for(n=0;n<4;n++)if(proc[n]){if(S[n]>.5){M[n][p]=1;has[n]=1}Q[n][p]=Math.round(S[n]*255)}}
+var o=document.createElement("canvas");o.width=W;o.height=H;var oc=o.getContext("2d"),od=oc.createImageData(W,H),op=od.data,cnt=[0,0,0],T=Math.max(24,Math.round(W/40)),TW=Math.ceil(W/T),tl={},COL=[[224,0,42],[255,140,0],[0,110,255]];
+function mark(p,c){if(op[p*4+3])return;var C=COL[c];op[p*4]=C[0];op[p*4+1]=C[1];op[p*4+2]=C[2];op[p*4+3]=210;cnt[c]++;var t=Math.floor(p/W/T)*TW+Math.floor((p%W)/T),e=tl[t]||(tl[t]=[0,0,0]);e[c]++}
+for(n=0;n<4+ns;n++){if(!has[n])continue;var m=M[n],q;
+if(hw>=1){var ope=boxop(boxop(m,W,H,hw,0),W,H,hw,1);for(q=0;q<N;q++)if(m[q]&&!ope[q])mark(q,0)}
+if(hg>=1){var inv=new Uint8Array(N);for(q=0;q<N;q++)inv[q]=m[q]?0:1;var oi=boxop(boxop(inv,W,H,hg,0),W,H,hg,1);for(q=0;q<N;q++)if(inv[q]&&!oi[q])mark(q,2)}}
+if(md>0)for(n=0;n<4;n++){if(!proc[n])continue;var lm=boxop(Q[n],W,H,1,1),th=md*2.55;for(p=0;p<N;p++)if(Q[n][p]>=3&&lm[p]<=th)mark(p,1)}
+oc.putImageData(od,0,0);ov=o;draw();
+var mm2=px*px,warn=(hw<1||hg<1)?"<br><b>Роздільність:</b> 1 піксель = "+px.toFixed(3)+" мм, тож лінії й зазори тонші за ~"+(1.5*px).toFixed(2)+" мм не перевіряються. Перевірку ліній пропущено, якщо мінімум менший.":"";
+$("prs").innerHTML="<span style='color:#e0002a'>■</span> Тонкі елементи (&lt;"+mw+" мм): <b>"+(cnt[0]*mm2).toFixed(2)+" мм²</b><br><span style='color:#006eff'>■</span> Закриті зазори (&lt;"+mg+" мм): <b>"+(cnt[2]*mm2).toFixed(2)+" мм²</b><br><span style='color:#ff8c00'>■</span> Світлі точки (&lt;"+md+"%): <b>"+(cnt[1]*mm2).toFixed(2)+" мм²</b>"+warn+(cnt[0]+cnt[1]+cnt[2]?"":"<br>Проблем не знайдено.");
+var ts=Object.keys(tl).map(function(t){var e=tl[t];return{t:+t,s:e[0]+e[1]+e[2],e:e}}).sort(function(a,b){return b.s-a.s}).slice(0,8),el=$("prl");el.innerHTML="";
+ts.forEach(function(z,j){var bt=document.createElement("button"),dom=z.e.indexOf(Math.max.apply(null,z.e));bt.className="chip";bt.style.margin="2px";bt.innerHTML="<span style='color:"+["#e0002a","#ff8c00","#006eff"][dom]+"'>■</span> Зона "+(j+1);bt.onclick=function(){var x0=((z.t%TW)+.5)*T,y0=(Math.floor(z.t/TW)+.5)*T,s=Math.min(V.f*80,Math.max(V.s,vw.clientWidth*.35/T));V.s=s;V.x=vw.clientWidth/2-x0*s;V.y=vw.clientHeight/2-y0*s;draw()};el.appendChild(bt)})}
+$("chk").onclick=function(){if(!src)return;$("prs").textContent="Перевірка…";setTimeout(function(){try{analyze()}catch(e){$("prs").textContent="Помилка перевірки: "+e.message}},30)};
+$("shw").onchange=draw;
+(function(){var c=document.createElement("canvas").getContext?document.createElement("canvas"):null;c.width=900;c.height=600;var x=c.getContext("2d"),g=x.createLinearGradient(0,0,900,0);g.addColorStop(0,"#00aeef");g.addColorStop(.33,"#ec008c");g.addColorStop(.66,"#fff200");g.addColorStop(1,"#231f20");x.fillStyle="#fff";x.fillRect(0,0,900,600);x.fillStyle=g;x.fillRect(0,0,900,300);x.fillStyle="#da291c";x.fillRect(40,330,200,100);x.fillStyle="#231f20";x.font="bold 64px sans-serif";x.fillText("FLEXO 0.1pt",40,540);for(var i=0;i<8;i++)x.fillRect(560+i*40,470,i+1,100);setImage(c)})();
+</script></body></html>
