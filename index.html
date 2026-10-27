@@ -98,7 +98,7 @@ input[type=number],input[type=text]{height:40px}
 <div class="box"><label class="file">Відкрити файл: PDF, AI, CDR, TIF, PNG, JPG. Кілька файлів = окремі пластини<input type="file" id="f" accept=".pdf,.ai,.cdr,.tif,.tiff,.len,image/*" multiple></label></div>
 <div class="chips seg" id="tabs"></div><div class="tp" id="t-c">
 <div class="box"><h2>Розділення</h2><div id="inks"></div>
-<label>Пластини чорно-білі <input type="checkbox" id="plc"></label><div class="out" id="spotnote"></div><datalist id="pt"></datalist></div>
+<label>Пластини чорно-білі <input type="checkbox" id="plc"></label><label>Інвертувати пластини <input type="checkbox" id="inv"></label><div class="out" id="spotnote"></div><datalist id="pt"></datalist></div>
 <div class="box"><h2>Орієнтовний рецепт</h2><div class="out" id="rcp">Натисніть «Рецепт» біля плашки або після піпетки. Це узагальнений орієнтир, не точна рецептура.</div>
 <details><summary>Бібліотека Pantone (CSV)</summary><input type="file" id="libf" accept=".csv,.txt" style="margin-top:6px"><div class="out" id="libst"></div><div class="out">Рядок: назва; L; a; b; формула (необов’язково). Роздільник ; або Tab, крапка в числах. Бібліотека зберігається лише в вашому браузері.</div></details>
 <details><summary>Свої базові фарби (необов’язково)</summary><textarea id="bas" rows="5" style="width:100%;margin-top:6px;padding:6px;border:1px solid var(--line);border-radius:4px;background:var(--bg);color:var(--ink);font:inherit" placeholder="Yellow #FEDD00&#10;Rubine #CE0058"></textarea><div class="out">Рядок: назва і колір відбитка основи в hex. Якщо порожньо, береться типовий набір із 9 основ плюс біла.</div></details></div>
@@ -230,7 +230,7 @@ function buildLayers(){var el=$("lays"),L=[],chs=[];el.innerHTML="";try{for(var 
 L.forEach(function(e,i){var id=e[0],g=e[1],r=document.createElement("div"),c=document.createElement("input"),t=document.createElement("span"),s=document.createElement("button");r.className="row";c.type="checkbox";c.checked=!!g.visible;t.className="nm";t.textContent=g.name||("Шар "+(i+1));s.className="chip";s.textContent="Лише";chs.push([id,c]);
 c.onchange=function(){OC.setVisibility(id,c.checked);drawPdf(true)};
 s.onclick=function(){chs.forEach(function(x){var v=x[0]===id;OC.setVisibility(x[0],v);x[1].checked=v});drawPdf(true)};r.appendChild(c);r.appendChild(t);r.appendChild(s);el.appendChild(r)})}
-async function openPdf(buf){var pdf=await pdfjsLib.getDocument({data:buf}).promise,pg=await pdf.getPage(1),v0=pg.getViewport({scale:1});PG=pg;VP=pg.getViewport({scale:Math.min(4,1600/Math.max(v0.width,v0.height))});OC=await pdf.getOptionalContentConfig();await drawPdf(false);buildLayers();$("wcm").value=(v0.width/72*2.54).toFixed(1);upd();msg("Сторінка 1 з "+pdf.numPages+". Колір з PDF переведено в RGB, тож розділення наближені.")}
+async function openPdf(buf){GSB=buf.slice(0);var pdf=await pdfjsLib.getDocument({data:buf}).promise,pg=await pdf.getPage(1),v0=pg.getViewport({scale:1});PG=pg;VP=pg.getViewport({scale:Math.min(4,1600/Math.max(v0.width,v0.height))});OC=await pdf.getOptionalContentConfig();await drawPdf(false);buildLayers();$("wcm").value=(v0.width/72*2.54).toFixed(1);upd();msg("Сторінка 1 з "+pdf.numPages+". Попередній перегляд в RGB, розкладаю на фарби…");sepPdf(v0)}
 function openTif(buf){var f=UTIF.decode(buf)[0];UTIF.decodeImage(buf,f);
 var spp=f.t277?f.t277[0]:3,ph=f.t262?f.t262[0]:2,bps=f.t258?f.t258[0]:8,pc=f.t284?f.t284[0]:1;
 if(ph==5&&spp>=4&&bps==8&&pc==1&&f.data&&f.data.length>=f.width*f.height*spp){var NN=f.width*f.height,L=[],nm=["Cyan","Magenta","Yellow","Black"];for(var c0=0;c0<spp;c0++){var d0=new Uint8Array(NN);for(var i0=0,j0=c0;i0<NN;i0++,j0+=spp)d0[i0]=f.data[j0];L.push({name:c0<4?nm[c0]:"Канал "+(c0+1),c:c0<4?INK[c0]:PCOL[(c0-4)%PCOL.length],d:d0})}
@@ -261,10 +261,31 @@ $("opn").onclick=function(){$("f").click()};
 (function(){var I=function(p){return'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>'},tb=function(i){$("tabs").children[i].click()},tl=function(i){$("tools").children[i].click()};
 var R=[["Перегляд",I('<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>'),function(){tl(0);fit()}],["Вимірювання",I('<path d="M3 17L17 3l4 4L7 21z"/><path d="M8 12l2 2M11 9l2 2M14 6l2 2"/>'),function(){tl(1);tb(3)}],["Перевірка",I('<circle cx="6" cy="6" r="1"/><circle cx="12" cy="6" r="1.6"/><circle cx="18" cy="6" r="2.2"/><circle cx="6" cy="14" r="1.6"/><circle cx="12" cy="14" r="2.2"/><circle cx="18" cy="14" r="1"/><circle cx="6" cy="21" r="2.2"/><circle cx="12" cy="21" r="1"/>'),function(){tb(1)}],["Кольори",I('<circle cx="12" cy="12" r="9"/><circle cx="8" cy="10" r="1"/><circle cx="12" cy="7" r="1"/><circle cx="16" cy="10" r="1"/>'),function(){tb(0)}],["Файли",I('<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/>'),function(){$("f").click()}],["Вартість",I('<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/>'),function(){tb(2)}]],rail=$("rail");
 R.forEach(function(r,i){var b=document.createElement("button");b.className="rb"+(i==0?" on":"");b.innerHTML=r[1]+"<span>"+r[0]+"</span>";b.onclick=function(){[].forEach.call(rail.children,function(x){x.classList.remove("on")});b.classList.add("on");r[2]()};rail.appendChild(b)})})();
+/* ---- Ghostscript: розкладання PDF на фарби ---- */
+var GSB=null,GS=null,GSLOG=[],GSTOK=0;
+async function loadGS(){if(GS)return GS;var base="https://cdn.jsdelivr.net/npm/@jspawn/ghostscript-wasm@0.0.2/",init=null;
+try{var m=await import(base+"gs.js");init=m.default||m.Module||m}catch(e){init=null}
+if(typeof init!="function"){await new Promise(function(res,rej){var s=document.createElement("script");s.src=base+"gs.js";s.onload=res;s.onerror=function(){rej(new Error("не вдалося завантажити gs.js"))};document.head.appendChild(s)});init=window.Module}
+if(typeof init!="function")throw new Error("невідомий формат модуля Ghostscript");
+GS=await init({locateFile:function(p){return base+p},print:function(t){GSLOG.push(t)},printErr:function(t){GSLOG.push(t)}});return GS}
+function readSep(gs,name){var b=gs.FS.readFile(name).slice(),buf=b.buffer,f=UTIF.decode(buf)[0];UTIF.decodeImage(buf,f);var rgba=UTIF.toRGBA8(f),n=f.width*f.height,d=new Uint8Array(n),s=0;for(var i=0,j=0;j<n;i+=4,j++){d[j]=255-(.3*rgba[i]+.59*rgba[i+1]+.11*rgba[i+2]);s+=d[j]}return{d:d,W:f.width,H:f.height,mean:s/n/2.55}}
+async function sepPdf(v0){var tok=++GSTOK,gs=null;try{msg("Розкладаю на фарби (Ghostscript). Перший раз довше, бібліотека вантажиться з інтернету…");gs=await loadGS();
+var inch=Math.max(v0.width,v0.height)/72,dpi=Math.max(36,Math.min(300,Math.floor(3200/inch)));gs.FS.writeFile("in.pdf",new Uint8Array(GSB));GSLOG.length=0;
+try{await gs.callMain(["-dBATCH","-dNOPAUSE","-dSAFER","-dFirstPage=1","-dLastPage=1","-sDEVICE=tiffsep","-r"+dpi,"-sOutputFile=sep_%d.tif","in.pdf"])}catch(e){if(!(e&&e.name=="ExitStatus"))throw e}
+var all=gs.FS.readdir("/"),files=all.filter(function(n){return/\(.+\)\.tif$/i.test(n)});
+if(!files.length)throw new Error("Ghostscript не створив пластин. Файли: "+all.join(", ")+". Журнал: "+GSLOG.slice(-5).join(" | "));
+var L=[],spk=0;files.forEach(function(n){var r=readSep(gs,n),nm=n.match(/\((.+)\)\.tif$/i)[1],g=guessInk(nm,spk);if(g[0]==9)spk++;r.name=nm;r.key=g[0];r.c=g[1];L.push(r);gs.FS.unlink(n)});
+if(tok!=GSTOK)return;
+var inv=L.filter(function(p){return p.mean>50}).length>L.length/2;if(inv)L.forEach(function(p){for(var i=0;i<p.d.length;i++)p.d[i]=255-p.d[i]});
+L.sort(function(a,b){return a.key-b.key});setPlates(L,L[0].W,L[0].H);$("inv").checked=inv;$("laybox").style.display="none";
+msg("Розкладено Ghostscript ("+dpi+" dpi): "+L.map(function(p){return p.name}).join(", ")+".")}
+catch(e){if(tok==GSTOK)msg("Розкладання через Ghostscript не вдалося: "+(e&&e.message?e.message:e)+". Лишається наближений RGB-перегляд.")}
+finally{try{gs&&gs.FS.unlink("in.pdf")}catch(x){}}}
+$("inv").onchange=function(){if(!PL)return;PL.n.forEach(function(p){var d=p.d,s=0;for(var i=0;i<d.length;i++){d[i]=255-d[i];s+=d[i]}p.cov=s/d.length/2.55});buildInks();simP();thumbs();upd()};
 /* ---- справжні пластини (CMYK/плашки) ---- */
 var PL=null,PCOL=[[255,102,0],[130,60,170],[0,150,90],[200,160,0],[220,50,50],[60,120,220]];
 function shrink(d,W,H,f){var w=Math.floor(W/f),h=Math.floor(H/f),o=new Uint8Array(w*h),n=f*f;for(var y=0;y<h;y++)for(var x=0;x<w;x++){var s=0;for(var yy=0;yy<f;yy++){var r=(y*f+yy)*W+x*f;for(var xx=0;xx<f;xx++)s+=d[r+xx]}o[y*w+x]=s/n}return o}
-function setPlates(list,W,H){var f=Math.max(1,Math.ceil(Math.max(W,H)/1600));if(f>1){list.forEach(function(p){p.d=shrink(p.d,W,H,f)});W=Math.floor(W/f);H=Math.floor(H/f)}
+function setPlates(list,W,H){$("inv").checked=false;var f=Math.max(1,Math.ceil(Math.max(W,H)/1600));if(f>1){list.forEach(function(p){p.d=shrink(p.d,W,H,f)});W=Math.floor(W/f);H=Math.floor(H/f)}
 PL={n:list.map(function(p){var s=0,d=p.d;for(var i=0;i<d.length;i++)s+=d[i];return{name:p.name,c:p.c,d:d,on:1,cov:s/d.length/2.55}})};
 sp=PL.n.slice(4).map(function(){return{on:1,c:[0,0,0],rep:[0,0,0],pct:0}});sc.width=W;sc.height=H;src=sx.createImageData(W,H);line=null;ov=null;$("prl").innerHTML="";$("prs").textContent="";buildInks();simP();fit();upd();thumbs()}
 function simP(){var W=sc.width,H=sc.height,N=W*H,o=sx.createImageData(W,H),p=o.data,a=+$("dg").value/100,op=+$("op").value/100,pl=$("plc").checked,L=PL.n.filter(function(q){return q.on}),i,k,j;
